@@ -1,7 +1,7 @@
 package net.esmatov.individuals_api.client;
 
-import net.esmatov.individuals_api.client.http_body.UserAccessToken;
-import net.esmatov.individuals_api.client.http_body.UserRepresentation;
+import net.esmatov.individuals_api.client.keycloak_model.UserAccessToken;
+import net.esmatov.individuals_api.client.keycloak_model.UserRepresentation;
 import net.esmatov.individuals_api.configuration.KeycloakConfigurationProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

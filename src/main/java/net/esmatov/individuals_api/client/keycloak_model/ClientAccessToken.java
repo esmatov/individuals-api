@@ -1,22 +1,16 @@
-package net.esmatov.individuals_api.client.http_body;
+package net.esmatov.individuals_api.client.keycloak_model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(value = {"not-before-policy", "session_state", "scope"}, allowSetters = true)
-public class UserAccessToken {
+public class ClientAccessToken {
 
     private String accessToken;
     private Integer expiresIn;
     private Integer refreshExpiresIn;
-    private String refreshToken;
     private String tokenType;
-    @JsonProperty("not-before-policy")
     private Integer notBeforePolicy;
-    private String sessionState;
     private String scope;
 
     public String getAccessToken() {
@@ -43,14 +37,6 @@ public class UserAccessToken {
         this.refreshExpiresIn = refreshExpiresIn;
     }
 
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
-
     public String getTokenType() {
         return tokenType;
     }
@@ -65,14 +51,6 @@ public class UserAccessToken {
 
     public void setNotBeforePolicy(Integer notBeforePolicy) {
         this.notBeforePolicy = notBeforePolicy;
-    }
-
-    public String getSessionState() {
-        return sessionState;
-    }
-
-    public void setSessionState(String sessionState) {
-        this.sessionState = sessionState;
     }
 
     public String getScope() {

@@ -1,6 +1,6 @@
 package net.esmatov.individuals_api.utils;
 
-import net.esmatov.individuals_api.client.http_body.UserRepresentation;
+import net.esmatov.individuals_api.client.keycloak_model.UserRepresentation;
 import net.esmatov.individuals_api.dto.UserRegistrationRequest;
 
 public class Mappers {

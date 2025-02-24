@@ -1,4 +1,4 @@
-package net.esmatov.individuals_api.client.http_body;
+package net.esmatov.individuals_api.client.keycloak_model;
 
 import java.time.LocalDateTime;
 import java.util.List;
