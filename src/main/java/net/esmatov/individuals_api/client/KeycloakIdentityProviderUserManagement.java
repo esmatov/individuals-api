@@ -8,6 +8,7 @@ import net.esmatov.individuals_api.exception.InvalidUserTokenKeycloakException;
 import net.esmatov.individuals_api.exception.UnauthorizedUserKeycloakException;
 import net.esmatov.individuals_api.exception.UserConflictKeycloakException;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -25,7 +26,7 @@ import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-@Service
+@Component
 public class KeycloakIdentityProviderUserManagement implements IdentityProviderUserManagement {
 
     private final KeycloakConfigurationProperties kcProperties;
