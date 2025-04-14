@@ -12,13 +12,9 @@ public class Tools {
     }
 
     public static List<String> extractUserAccountRolesFromJwt(Map<String, Object> resourceAccess) {
-        Map<String, Object> accountRoles = (Map) resourceAccess.get("account");
+        Map accountRoles = (Map) resourceAccess.get("account");
         List<String> roles = (List<String>) accountRoles.get("roles");
-
         return roles;
-
-        /*(resourceAccess != null && resourceAccess.containsKey("account")) ?
-                (List<String>) resourceAccess.get("account") : List.of();*/
     }
 
 }
