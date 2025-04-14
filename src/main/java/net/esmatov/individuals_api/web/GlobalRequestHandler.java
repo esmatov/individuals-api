@@ -2,10 +2,11 @@ package net.esmatov.individuals_api.web;
 
 import net.esmatov.individuals_api.client.keycloak_model.UserAccessToken;
 import net.esmatov.individuals_api.client.keycloak_model.UserRepresentation;
+import net.esmatov.individuals_api.dto.AboutMeResponse;
 import net.esmatov.individuals_api.dto.UserLoginRequest;
 import net.esmatov.individuals_api.dto.UserRefreshTokenRequest;
 import net.esmatov.individuals_api.dto.UserRegistrationRequest;
-import net.esmatov.individuals_api.service.UserAdministrationService;
+import net.esmatov.individuals_api.service.AdministrationService;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -19,52 +20,62 @@ import java.net.URI;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @Component
-public class CommonRequestHandler {
+public class GlobalRequestHandler {
 
-    private final UserAdministrationService userAdministrationService;
+    private final AdministrationService administrationService;
+    private final RequestValidator validator;
 
-    public CommonRequestHandler(UserAdministrationService userAdministrationService) {
-        this.userAdministrationService = userAdministrationService;
+    public GlobalRequestHandler(AdministrationService administrationService, RequestValidator validator) {
+        this.administrationService = administrationService;
+        this.validator = validator;
     }
 
-    public Mono<ServerResponse> handleUserRegistration(ServerRequest request) {
-        return request.bodyToMono(UserRegistrationRequest.class)
-                .flatMap(userAdministrationService::signUp)
+    public Mono<ServerResponse> handleUserRegistration(ServerRequest registrationRequest) {
+        return registrationRequest.bodyToMono(UserRegistrationRequest.class)
+                .doOnNext(validator::validate)
+                .flatMap(administrationService::signUp)
                 .flatMap(tuples -> {
                     UserRepresentation user = tuples.getT1();
                     UserAccessToken userToken = tuples.getT2();
-                    return ServerResponse.created(URI.create(user.getId().toString()))
+                    return ServerResponse
+                            .created(URI.create(String.valueOf(user.getId())))
                             .contentType(APPLICATION_JSON)
                             .bodyValue(userToken);
                 });
     }
 
-    public Mono<ServerResponse> handleUserLogin(ServerRequest request) {
-        return request.bodyToMono(UserLoginRequest.class)
-                .flatMap(userAdministrationService::signIn)
+    public Mono<ServerResponse> handleUserLogin(ServerRequest loginRequest) {
+        return loginRequest.bodyToMono(UserLoginRequest.class)
+                .doOnNext(validator::validate)
+                .flatMap(administrationService::signIn)
                 .flatMap(userToken ->
-                        ServerResponse.ok()
+                        ServerResponse
+                                .ok()
                                 .contentType(APPLICATION_JSON)
                                 .bodyValue(userToken));
     }
 
-    public Mono<ServerResponse> handleUserRefreshToken(ServerRequest request) {
-        return request.bodyToMono(UserRefreshTokenRequest.class)
-                .flatMap(userAdministrationService::refreshToken)
+    public Mono<ServerResponse> handleUserRefreshToken(ServerRequest refreshTokenRequest) {
+        return refreshTokenRequest.bodyToMono(UserRefreshTokenRequest.class)
+                .doOnNext(validator::validate)
+                .flatMap(administrationService::refreshToken)
                 .flatMap(userToken ->
-                        ServerResponse.ok()
+                        ServerResponse
+                                .ok()
                                 .contentType(APPLICATION_JSON)
                                 .bodyValue(userToken));
     }
 
-    public Mono<ServerResponse> handleAboutMe(ServerRequest request) {
+    public Mono<ServerResponse> handleAboutMe(ServerRequest ignore) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .filter(authentication -> authentication.getPrincipal() instanceof Jwt)
                 .flatMap(authentication ->
-                        ServerResponse.ok()
+                        ServerResponse
+                                .ok()
                                 .contentType(APPLICATION_JSON)
-                                .bodyValue(userAdministrationService.aboutMe((Jwt) authentication.getPrincipal())));
+                                .body(administrationService.aboutMe((Jwt) authentication.getPrincipal()),
+                                        AboutMeResponse.class));
     }
 
 }
