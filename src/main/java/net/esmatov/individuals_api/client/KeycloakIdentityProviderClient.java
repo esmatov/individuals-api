@@ -2,6 +2,7 @@ package net.esmatov.individuals_api.client;
 
 import net.esmatov.individuals_api.client.keycloak_model.ClientAccessToken;
 import net.esmatov.individuals_api.configuration.KeycloakConfigurationProperties;
+import net.esmatov.individuals_api.exception.GenericErrorClientException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -11,38 +12,29 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Component
-public class KeycloakClientApplication {
+public class KeycloakIdentityProviderClient implements IdentityProviderClient {
 
     private final KeycloakConfigurationProperties kcProperties;
     private final WebClient kcWebClient;
-    private final AtomicReference<Mono<ClientAccessToken>> clientAccessTokenMonoAtomRef =
-            new AtomicReference<>(Mono.empty());
     private final String ACCESS_TOKEN_PATH;
+    private final Mono<ClientAccessToken> clientAccessTokenMonoWithCache;
 
-    public KeycloakClientApplication(KeycloakConfigurationProperties kcProperties,
-                                     @Qualifier("keycloakWebClient") WebClient kcWebClient) {
+    public KeycloakIdentityProviderClient(KeycloakConfigurationProperties kcProperties,
+                                          @Qualifier("keycloakWebClient") WebClient kcWebClient) {
         this.kcProperties = kcProperties;
         this.kcWebClient = kcWebClient;
         this.ACCESS_TOKEN_PATH = String.format("/realms/%s/protocol/openid-connect/token", kcProperties.getRealm());
+        this.clientAccessTokenMonoWithCache = Mono.defer(() -> requestClientAccessToken()
+                .cache(token -> Duration.ofSeconds(token.getExpiresIn() - 10L),
+                        exception -> Duration.ZERO,
+                        () -> Duration.ZERO));
     }
 
-    public Mono<ClientAccessToken> obtainClientAccessTokenWithCache() {
-        return clientAccessTokenMonoAtomRef.get()
-                .switchIfEmpty(
-                        Mono.defer(() -> {
-                            Mono<ClientAccessToken> tokenMono = requestClientAccessToken()
-                                    .cache(
-                                            token -> Duration.ofSeconds(token.getExpiresIn() - 10L),
-                                            exc -> Duration.ZERO,
-                                            () -> Duration.ZERO
-                                    );
-                            return clientAccessTokenMonoAtomRef.compareAndSet(Mono.empty(), tokenMono) ?
-                                    tokenMono : clientAccessTokenMonoAtomRef.get();
-                        })
-                );
+    @Override
+    public synchronized Mono<ClientAccessToken> obtainClientAccessToken() {
+        return clientAccessTokenMonoWithCache;
     }
 
     private Mono<ClientAccessToken> requestClientAccessToken() {
@@ -50,12 +42,12 @@ public class KeycloakClientApplication {
         authFormData.add("grant_type", "client_credentials");
         authFormData.add("client_id", kcProperties.getAuthClientId());
         authFormData.add("client_secret", kcProperties.getAuthClientSecret());
-
         return kcWebClient.post()
                 .uri(uriBuilder -> uriBuilder.path(ACCESS_TOKEN_PATH).build())
                 .body(BodyInserters.fromFormData(authFormData))
                 .retrieve()
-                .bodyToMono(ClientAccessToken.class);
+                .bodyToMono(ClientAccessToken.class)
+                .onErrorMap(throwable -> GenericErrorClientException.withMessageServiceUnavailable());
     }
 
 }

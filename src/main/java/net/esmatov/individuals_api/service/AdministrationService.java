@@ -1,7 +1,9 @@
 package net.esmatov.individuals_api.service;
 
-import net.esmatov.individuals_api.client.KeycloakClientApplication;
-import net.esmatov.individuals_api.client.KeycloakUserManagement;
+import net.esmatov.individuals_api.client.IdentityProviderClient;
+import net.esmatov.individuals_api.client.IdentityProviderUserManagement;
+import net.esmatov.individuals_api.client.KeycloakIdentityProviderClient;
+import net.esmatov.individuals_api.client.KeycloakIdentityProviderUserManagement;
 import net.esmatov.individuals_api.client.keycloak_model.UserAccessToken;
 import net.esmatov.individuals_api.client.keycloak_model.UserRepresentation;
 import net.esmatov.individuals_api.dto.AboutMeResponse;
@@ -19,24 +21,29 @@ import static net.esmatov.individuals_api.utils.Mappers.userRegistrationRequestT
 import static net.esmatov.individuals_api.utils.Tools.extractUserAccountRolesFromJwt;
 
 @Service
-public class UserAdministrationService {
+public class AdministrationService {
 
-    private final KeycloakClientApplication kcClientApp;
-    private final KeycloakUserManagement kcUserManagement;
+    private final IdentityProviderClient kcClient;
+    private final IdentityProviderUserManagement kcUserManagement;
 
-    public UserAdministrationService(KeycloakClientApplication kcClientApp, KeycloakUserManagement kcUserManagement) {
-        this.kcClientApp = kcClientApp;
+    public AdministrationService(KeycloakIdentityProviderClient kcClient,
+                                 KeycloakIdentityProviderUserManagement kcUserManagement) {
+        this.kcClient = kcClient;
         this.kcUserManagement = kcUserManagement;
     }
 
     public Mono<Tuple2<UserRepresentation, UserAccessToken>> signUp(UserRegistrationRequest registrationRequest) {
-        return kcClientApp.obtainClientAccessTokenWithCache()
+        return kcClient.obtainClientAccessToken()
                 .flatMap(clientToken ->
-                        kcUserManagement.registerUser(userRegistrationRequestToUserRepresentation(registrationRequest),
-                                clientToken.getAccessToken()))
+                        kcUserManagement.registerUser(
+                                userRegistrationRequestToUserRepresentation(registrationRequest),
+                                clientToken.getAccessToken()
+                        ))
                 .zipWhen(user ->
-                        kcUserManagement.requestUserAccessToken(user.getUsername(),
-                                user.getCredentials().getFirst().getValue()));
+                        kcUserManagement.requestUserAccessToken(
+                                user.getUsername(),
+                                user.getCredentials().getFirst().getValue()
+                        ));
     }
 
     public Mono<UserAccessToken> signIn(UserLoginRequest loginRequest) {
@@ -47,14 +54,13 @@ public class UserAdministrationService {
         return kcUserManagement.requestUserAccessTokenByUserRefreshToken(refreshTokenRequest.getRefreshToken());
     }
 
-    public AboutMeResponse aboutMe(Jwt jwt) {
+    public Mono<AboutMeResponse> aboutMe(Jwt jwt) {
         String userId = jwt.getSubject();
         String username = jwt.getClaim("preferred_username");
         String name = jwt.getClaim("name");
         String email = jwt.getClaim("email");
         List<String> roles = extractUserAccountRolesFromJwt(jwt.getClaimAsMap("resource_access"));
-
-        return new AboutMeResponse(userId, username, name, email, roles);
+        return Mono.just(new AboutMeResponse(userId, username, name, email, roles));
     }
 
 }
