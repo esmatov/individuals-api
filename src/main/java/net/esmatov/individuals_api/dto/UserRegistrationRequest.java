@@ -1,12 +1,23 @@
 package net.esmatov.individuals_api.dto;
 
+import jakarta.validation.constraints.*;
+
 public class UserRegistrationRequest {
 
+    @NotEmpty
     private String username;
+    @NotBlank
     private String firstName;
+    @NotBlank
     private String lastName;
+    @Email
+    @NotEmpty
     private String email;
+    @Size(min = 6)
+    @NotEmpty
     private String password;
+    @Size(min = 6)
+    @NotEmpty
     private String confirmPassword;
 
     public UserRegistrationRequest(String username, String firstName, String lastName,
