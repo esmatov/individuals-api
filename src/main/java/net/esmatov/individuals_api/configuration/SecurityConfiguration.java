@@ -9,7 +9,7 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 
-import static net.esmatov.individuals_api.web.RouterConfiguration.*;
+import static net.esmatov.individuals_api.web.GlobalRouterConfiguration.*;
 
 @Configuration
 @EnableWebFluxSecurity
