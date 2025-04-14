@@ -1,12 +1,12 @@
 package net.esmatov.individuals_api.dto;
 
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 
 public class UserLoginRequest {
 
-    @NotEmpty
+    @NotBlank
     private String username;
-    @NotEmpty
+    @NotBlank
     private String password;
 
     public String getUsername() {

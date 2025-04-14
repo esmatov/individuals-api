@@ -4,20 +4,18 @@ import jakarta.validation.constraints.*;
 
 public class UserRegistrationRequest {
 
-    @NotEmpty
+    @NotBlank
     private String username;
-    @NotBlank
     private String firstName;
-    @NotBlank
     private String lastName;
     @Email
-    @NotEmpty
+    @NotBlank
     private String email;
-    @Size(min = 6)
-    @NotEmpty
+    @Size(min = 6, max = 16)
+    @NotBlank
     private String password;
-    @Size(min = 6)
-    @NotEmpty
+    @Size(min = 6, max = 16)
+    @NotBlank
     private String confirmPassword;
 
     public UserRegistrationRequest(String username, String firstName, String lastName,
