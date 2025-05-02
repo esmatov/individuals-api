@@ -6,7 +6,9 @@ public class UserRegistrationRequest {
 
     @NotBlank
     private String username;
+    @NotBlank
     private String firstName;
+    @NotBlank
     private String lastName;
     @Email
     @NotBlank
