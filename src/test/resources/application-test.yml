@@ -8,10 +8,6 @@ spring:
         jwt:
           issuer-uri: ${KC_SERVER}:${KC_PORT}/realms/${KC_REALM}
 
-  docker:
-    compose:
-      enabled: false
-
 server:
   port: ${INDIVIDUALS_API_PORT}
 
