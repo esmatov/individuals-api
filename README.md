@@ -20,14 +20,14 @@ It includes the `individuals-api` client with OAuth2 settings.
 
 Before running the application, define the following environment variables:
 
-| Variable              | Description                                | Example Value                                  |
-|-----------------------|--------------------------------------------|------------------------------------------------|
-| `INDIVIDUALS_API_PORT`| Port where the API will run                | `8080`                                         |
-| `KC_CLIENT_ID`        | Keycloak client ID                         | `individuals-api`                              |
-| `KC_CLIENT_SECRET`    | Keycloak client secret                     | `54wCiwxzPESBMixFk8fajFz8sZkSSL6b`             |
-| `KC_PORT`             | Keycloak port                              | `8081`                                         |
-| `KC_REALM`            | Name of the realm                          | `microservices`                                |
-| `KC_SERVER`           | URL of the Keycloak server                 | `http://localhost:8081`                        |
+| Variable              | Description                                | Example Value                             |
+|-----------------------|--------------------------------------------|-------------------------------------------|
+| `INDIVIDUALS_API_PORT`| Port where the API will run                | `8080`                                    |
+| `KC_CLIENT_ID`        | Keycloak client ID                         | `individuals-api`                         |
+| `KC_CLIENT_SECRET`    | Keycloak client secret                     | `54wCiwxzPESBMixFk8fajFz8sZkSSL6b`        |
+| `KC_PORT`             | Keycloak port                              | `8081`                                    |
+| `KC_REALM`            | Name of the realm                          | `microservices`                           |
+| `KC_SERVER`           | URL of the Keycloak server                 | `http://localhost`                        |
 
 ## Authors
 Smatov Erlan
