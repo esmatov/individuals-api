@@ -1,37 +1,33 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version "$springBootVersion"
-    id 'io.spring.dependency-management' version "$springDependencyManagement"
+    id 'org.springframework.boot' version '3.3.11'
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
-group = 'net.esmatov'
-version = "$projectVersion"
+group = 'net.smatov'
+version = '0.0.1-SNAPSHOT'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of("$javaVersion")
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
 dependencies {
-    runtimeOnly("io.netty:netty-resolver-dns-native-macos:$nettyResolverDnsNativeMacosVersion")
+    implementation 'net.smatov:common-web-data:1.0.0'
 
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation('org.springframework.boot:spring-boot-starter-oauth2-resource-server')
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.flywaydb:flyway-core'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation 'io.projectreactor:reactor-test'
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation 'org.testcontainers:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
-    testImplementation "com.github.dasniko:testcontainers-keycloak:$testcontainersKeycloakVersion"
 }
 
 tasks.named('test') {
